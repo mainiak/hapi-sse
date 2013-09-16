@@ -1,0 +1,34 @@
+<html>
+<head>
+  <title>SSE test</title>
+</head>
+<body>
+<h1>SSE test</h1>
+<p>See your javascript console.</p>
+<script type="text/javascript">
+  if (!!window.EventSource) {
+      var source = new EventSource('/sse-events/');
+
+      source.addEventListener('message', function(e) {
+        console.log(e.data); // XXX
+      }, false);
+
+      source.addEventListener('open', function(e) {
+        // Connection was opened.
+        console.log('new connection'); // XXX
+      }, false);
+
+      source.addEventListener('error', function(e) {
+        if (e.readyState == EventSource.CLOSED) {
+          // Connection was closed.
+          console.log('closed connection'); // XXX
+        }
+      }, false);
+
+  } else {
+      // Result to xhr polling :(
+      console.log('We should do xhr polling :-/');
+  }
+</script>
+</body>
+</html>

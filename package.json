@@ -10,5 +10,9 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "hoek": "~1.0.3"
+  },
+  "devDependencies": {
+    "hapi": "~1.10.0",
+    "hoek": "~1.0.3"
   }
 }
