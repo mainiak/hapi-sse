@@ -1,4 +1,4 @@
-var Hapi, hostname, permissions, options, port, server, staticRoute;
+var Hapi, hostname, permissions, options, port, server, staticRoute, handler;
 
 Hapi = require('hapi');
 
@@ -12,6 +12,7 @@ permissions = {};
 options = {
   sse: '/sse-events/'
 };
+
 server.pack.allow(permissions).require(__dirname + '/..', options, function(err) {
   if (err) {
     console.err("Failed to load plugin.");
@@ -19,7 +20,7 @@ server.pack.allow(permissions).require(__dirname + '/..', options, function(err)
   }
 });
 
-staticRoute = {
+server.route({
   method: 'GET',
   path: '/{path*}',
   handler: {
@@ -29,10 +30,30 @@ staticRoute = {
       index: true
     }
   }
-};
-
-server.route([staticRoute]);
+});
 
 server.start(function() {
   return console.log("# Started at " + server.info.uri);
 });
+
+var handler = {
+  num: 0,
+  hapiSSE: server.plugins['hapi-sse']['channels']
+};
+
+function hailUsers() {
+  var users = this.hapiSSE._users;
+  var count = 0;
+  for (user in users) {
+    //console.log(user); // XXX
+    //console.log(users[user]); // XXX
+    //users[user].write('data: ' + this.num + "\n\n"); // XXX
+    this.hapiSSE.sendMsgTo(user, this.num);
+    count++;
+  }
+  console.log('i: ' + this.num + ', users: ' + count); // XXX
+  this.num++;
+}
+
+// every 10 secs
+setInterval(hailUsers.bind(handler), 10000);
